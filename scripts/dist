@@ -1,6 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 set -e
-cargo build --release --locked --target-dir target -Z sparse-registry
+
+TARGET=$CARGO_BUILD_TARGET
+CARCH=${TARGET//-*}
+
+cross build --features generate --target=${TARGET} --release --locked --target-dir target
 scripts/mkmo locale/
-strip target/release/paru
-tar --zstd -cfparu.tar.zst  man completions paru.conf locale -C target/release paru
+mv target/**/release/paru ./
+strip paru
+tar --zstd -cf paru-${CARCH}.tar.zst man completions paru.conf locale paru
+
